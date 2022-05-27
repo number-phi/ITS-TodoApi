@@ -15,6 +15,8 @@ using System.Threading.Tasks;
 using TodoApi.Data;
 using TodoApi.Services.Interfaces;
 using TodoApi.Services;
+using AutoMapper;
+using TodoApi.Helper;
 
 namespace TodoApi
 {
@@ -35,7 +37,11 @@ namespace TodoApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
             });
+            // configuriamo DB Context
             services.AddDbContext<TodoContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("TodoContext")));
+            // configuriamo AutoMapper
+            services.AddAutoMapper(typeof(AutomapperProfile));
+            // Configuriamo Servizi
             services.AddScoped<ITodoServices, TodoServices>();        
         }
 

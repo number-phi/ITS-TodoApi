@@ -5,38 +5,24 @@ using TodoApi.Data;
 using System.Linq;
 using System;
 using TodoApi.Data.Entities;
+using AutoMapper;
 
 namespace TodoApi.Services
 {
     public class TodoServices : ITodoServices
     {
         private readonly TodoContext _context;
+        private readonly IMapper _mapper;
 
-        public TodoServices(TodoContext context)
+        public TodoServices(TodoContext context, IMapper mapper)
         {
             _context = context;
-        }
-
-        private TodoItem ReflectionItem(TodoItemBaseModel item)
-        {
-            var newItem = new TodoItem();
-            newItem.Name = item.Name;
-            newItem.IsCompleted = item.IsCompleted;
-            return newItem;
-        }
-
-        private TodoItemModel ReflectionItemModel(TodoItem item)
-        {
-            var newItem = new TodoItemModel();
-            newItem.Id = item.Id;
-            newItem.Name = item.Name;
-            newItem.IsCompleted = item.IsCompleted;
-            return newItem;
+            _mapper = mapper;
         }
 
         public int CreateItem(TodoItemBaseModel item)
         {
-            var entity = ReflectionItem(item);
+            var entity = _mapper.Map<TodoItem>(item);
             _context.TodoItems.Add(entity);
             _context.SaveChanges();
 
@@ -62,8 +48,8 @@ namespace TodoApi.Services
             var listModel = new List<TodoItemModel>();
 
             foreach (var item in list)
-            {
-                listModel.Add(ReflectionItemModel(item));
+            {               
+                listModel.Add(_mapper.Map<TodoItemModel>(item));
             }
 
             return listModel;
@@ -73,7 +59,7 @@ namespace TodoApi.Services
         {
             var item = _context.TodoItems.FirstOrDefault(x => x.Id == id);
 
-            return ReflectionItemModel(item);
+            return _mapper.Map<TodoItemModel>(item);
         }
 
         public void UpdateItem(int id, TodoItemBaseModel item)
