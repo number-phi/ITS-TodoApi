@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TodoApi.Data;
 using TodoApi.Models;
 using TodoApi.Services;
@@ -28,24 +29,24 @@ namespace TodoApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public IEnumerable<TodoItemModel> GetAll()
+        public async Task<ActionResult> GetAll()
         {
-            return _services.GetAll();            
+            var result = await _services.GetAll();
+            return Ok(result);
         }
 
         // GET api/<TodoItemController>/5
         [HttpGet("{id}")]
-        public TodoItemModel GetItem(int id)
+        public async Task<ActionResult> GetItem(int id)
         {           
-            var item = _services.GetById(id);
+            var item = await _services.GetById(id);
             
             if (item == null)
             {
-                // Not Found
-                return null;
+                return NotFound();
             }
 
-            return item;
+            return Ok(item);
         }
 
         // POST api/<TodoItemController>
@@ -55,12 +56,12 @@ namespace TodoApi.Controllers
         /// <param name="value"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult Post([FromBody] TodoItemBaseModel value)
+        public async Task<ActionResult> Post([FromBody] TodoItemBaseModel value)
         {
             if(value == null)
                 return BadRequest("Item null");
 
-            var id = _services.CreateItem(value);
+            var id = await _services.CreateItem(value);
 
             return CreatedAtAction(nameof(GetItem), new {id = id }, id);
 
@@ -68,15 +69,15 @@ namespace TodoApi.Controllers
 
         // PUT api/<TodoItemController>/5
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] TodoItemBaseModel value)
+        public async Task<ActionResult> Put(int id, [FromBody] TodoItemBaseModel value)
         {
-            var todoItem = _services.GetById(id);
+            var todoItem = await _services.GetById(id);
             
             if (todoItem == null)
                 return NotFound("Todo Item Not Found");            
 
             try { 
-                _services.UpdateItem(id, value);
+                await _services.UpdateItem(id, value);
             }
             catch(Exception e)
             {
@@ -88,15 +89,15 @@ namespace TodoApi.Controllers
 
         // DELETE api/<TodoItemController>/5
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
-            var todoItem = _services.GetById(id);
+            var todoItem = await _services.GetById(id);
             if (todoItem == null) 
                 return NotFound("Todo Item Not Found");
 
             try
             {
-                _services.DeleteItem(id);
+                await _services.DeleteItem(id);
             }
             catch (Exception e)
             {

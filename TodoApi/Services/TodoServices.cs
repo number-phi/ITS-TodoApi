@@ -6,6 +6,8 @@ using System.Linq;
 using System;
 using TodoApi.Data.Entities;
 using AutoMapper;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace TodoApi.Services
 {
@@ -20,16 +22,16 @@ namespace TodoApi.Services
             _mapper = mapper;
         }
 
-        public int CreateItem(TodoItemBaseModel item)
+        public async Task<int> CreateItem(TodoItemBaseModel item)
         {
             var entity = _mapper.Map<TodoItem>(item);
-            _context.TodoItems.Add(entity);
-            _context.SaveChanges();
+            _context.TodoItems.Add(entity);            
+            await _context.SaveChangesAsync();
 
             return entity.Id;
         }
 
-        public void DeleteItem(int id)
+        public async Task DeleteItem(int id)
         {
             var item = _context.TodoItems.FirstOrDefault(x => x.Id == id);
             if (item == null)
@@ -38,12 +40,12 @@ namespace TodoApi.Services
             }
 
             _context.TodoItems.Remove(item);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public List<TodoItemModel> GetAll()
+        public async Task<List<TodoItemModel>> GetAll()
         {
-            var list = _context.TodoItems.ToList();
+            var list = await _context.TodoItems.ToListAsync();
 
             var listModel = new List<TodoItemModel>();
 
@@ -55,16 +57,16 @@ namespace TodoApi.Services
             return listModel;
         }
 
-        public TodoItemModel GetById(int id)
+        public async Task<TodoItemModel> GetById(int id)
         {
-            var item = _context.TodoItems.FirstOrDefault(x => x.Id == id);
+            var item = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id);
 
             return _mapper.Map<TodoItemModel>(item);
         }
 
-        public void UpdateItem(int id, TodoItemBaseModel item)
+        public async Task UpdateItem(int id, TodoItemBaseModel item)
         {
-            var itemFound = _context.TodoItems.FirstOrDefault(x => x.Id == id);
+            var itemFound = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id);
 
             if (itemFound == null)
                 throw new System.Exception("Item Not Found");
@@ -72,8 +74,7 @@ namespace TodoApi.Services
             itemFound.Name = item.Name;
             itemFound.IsCompleted = item.IsCompleted;
             _context.TodoItems.Update(itemFound);
-            _context.SaveChanges();
-
+            await _context.SaveChangesAsync();
         }
     }
 }
