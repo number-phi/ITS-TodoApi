@@ -17,6 +17,8 @@ using TodoApi.Services.Interfaces;
 using TodoApi.Services;
 using AutoMapper;
 using TodoApi.Helper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 
 namespace TodoApi
 {
@@ -32,10 +34,52 @@ namespace TodoApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //// Implementazione servizio di autenticazione
+            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            //    .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
+
+            //services.AddCors();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
+
+                //c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                //{
+                //    Type = SecuritySchemeType.OAuth2,
+                //    Flows = new OpenApiOAuthFlows()
+                //    {
+                //        Implicit = new OpenApiOAuthFlow()
+                //        {
+                //            AuthorizationUrl = new Uri("https://login.microsoftonline.com/{TenantId}/oauth2/v2.0/authorize"),
+                //            TokenUrl = new Uri("https://login.microsoftonline.com/{TenantId}/oauth2/v2.0/token"),
+                //            Scopes = new Dictionary<string, string>
+                //            {
+                //                { "api://{AppUrl}/ReadWriteAccess", "ReadWrite" }
+                //            }
+                //        }
+                //    }
+                //});
+                //c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                //{
+                //     {
+                //     new OpenApiSecurityScheme
+                //        {
+                //        Reference = new OpenApiReference
+                //        {
+                //        Type = ReferenceType.SecurityScheme,
+                //        Id = "oauth2"
+                //        },
+                //                Scheme = "oauth2",
+                //                Name = "oauth2",
+                //                In = ParameterLocation.Header
+                //     },
+                //        new List<string>()
+                //     }
+                //});
+
             });
             // configuriamo DB Context
             services.AddDbContext<TodoContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("TodoContext")));
@@ -50,14 +94,28 @@ namespace TodoApi
         {
             if (env.IsDevelopment())
             {
+                
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoApi v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoApi v1");
+                    // Auth
+                    //c.OAuthClientId("11111111-1111-1111-11111111111111111");
+                    //c.OAuthClientSecret("Mp5YKhbwbd4hUh3dDk9Ca.61RTd_Sv~IT~");
+                    //c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+                }
+                );
+
+                
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            //// Implementazione Autenticazione
+            //app.UseAuthentication();
 
             app.UseAuthorization();
 
@@ -65,6 +123,13 @@ namespace TodoApi
             {
                 endpoints.MapControllers();
             });
+
+            //// global cors policy
+            //app.UseCors(x => x
+            //    .AllowAnyOrigin()
+            //    .AllowAnyMethod()
+            //    .AllowAnyHeader());
+
         }
     }
 }
