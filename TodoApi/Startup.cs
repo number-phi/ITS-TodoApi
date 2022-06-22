@@ -35,50 +35,53 @@ namespace TodoApi
         public void ConfigureServices(IServiceCollection services)
         {
 
-            //// Implementazione servizio di autenticazione
-            //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            //    .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
+            // Implementazione servizio di autenticazione
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
 
             //services.AddCors();
+
+            var tenantId = "22222222-2222-2222-2222-222222222222";
+            var appId = "22222222-2222-2222-2222-222222222222";
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TodoApi", Version = "v1" });
 
-                //c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-                //{
-                //    Type = SecuritySchemeType.OAuth2,
-                //    Flows = new OpenApiOAuthFlows()
-                //    {
-                //        Implicit = new OpenApiOAuthFlow()
-                //        {
-                //            AuthorizationUrl = new Uri("https://login.microsoftonline.com/{TenantId}/oauth2/v2.0/authorize"),
-                //            TokenUrl = new Uri("https://login.microsoftonline.com/{TenantId}/oauth2/v2.0/token"),
-                //            Scopes = new Dictionary<string, string>
-                //            {
-                //                { "api://{AppUrl}/ReadWriteAccess", "ReadWrite" }
-                //            }
-                //        }
-                //    }
-                //});
-                //c.AddSecurityRequirement(new OpenApiSecurityRequirement()
-                //{
-                //     {
-                //     new OpenApiSecurityScheme
-                //        {
-                //        Reference = new OpenApiReference
-                //        {
-                //        Type = ReferenceType.SecurityScheme,
-                //        Id = "oauth2"
-                //        },
-                //                Scheme = "oauth2",
-                //                Name = "oauth2",
-                //                In = ParameterLocation.Header
-                //     },
-                //        new List<string>()
-                //     }
-                //});
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows()
+                    {
+                        Implicit = new OpenApiOAuthFlow()
+                        {
+                            AuthorizationUrl = new Uri($"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/authorize"),
+                            TokenUrl = new Uri($"https://login.microsoftonline.com/{tenantId}/oauth2/v2.0/token"),
+                            Scopes = new Dictionary<string, string>
+                            {
+                                { $"api://{appId}/ReadAccess", "ReadAccess" }
+                            }                            
+                        }
+                    }
+                });
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                     {
+                     new OpenApiSecurityScheme
+                        {
+                        Reference = new OpenApiReference
+                        {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "oauth2"
+                        },
+                                Scheme = "oauth2",
+                                Name = "oauth2",
+                                In = ParameterLocation.Header
+                     },
+                        new List<string>()
+                     }
+                });
 
             });
             // configuriamo DB Context
@@ -101,21 +104,19 @@ namespace TodoApi
                 {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoApi v1");
                     // Auth
-                    //c.OAuthClientId("11111111-1111-1111-11111111111111111");
-                    //c.OAuthClientSecret("Mp5YKhbwbd4hUh3dDk9Ca.61RTd_Sv~IT~");
-                    //c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
+                    c.OAuthClientId("22222222-2222-2222-2222-222222222222");
+                    c.OAuthClientSecret("22222222-2222-2222-2222-222222222222");
+                    c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
                 }
                 );
-
-                
             }
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
 
-            //// Implementazione Autenticazione
-            //app.UseAuthentication();
+            // Implementazione Autenticazione
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ using TodoApi.Services.Interfaces;
 
 namespace TodoApi.Controllers
 {
+    [Authorize]
     [Route("api/TodoItems")]
     [ApiController]
     public class TodoItemController : ControllerBase
