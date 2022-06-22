@@ -9,6 +9,7 @@ namespace TodoApi.Services.Interfaces
     {
         //api/TodoItems
         public Task<List<TodoItemModel>> GetAll();
+        public Task<(List<TodoItemModel> items, int tot)> GetAll(int page, int limit);
         public Task<int> CreateItem(TodoItemBaseModel item);
 
         //api/TodoItems/{id}

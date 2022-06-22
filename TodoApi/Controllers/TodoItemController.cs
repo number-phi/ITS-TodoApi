@@ -29,10 +29,11 @@ namespace TodoApi.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult> GetAll()
+        public async Task<ActionResult> GetAll(int page, int limit)
         {
-            var result = await _services.GetAll();
-            return Ok(result);
+            var result = await _services.GetAll(page, limit);
+            
+            return Ok(new PagedModel<TodoItemModel>(result.items, page, limit,result.tot));
         }
 
         // GET api/<TodoItemController>/5

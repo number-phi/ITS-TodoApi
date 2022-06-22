@@ -57,6 +57,25 @@ namespace TodoApi.Services
             return listModel;
         }
 
+        public async Task<(List<TodoItemModel> items, int tot)> GetAll(int page, int limit)
+        {
+            var tot = await _context.TodoItems.CountAsync();
+
+            page = (page < 0) ? 1 : page;
+            var startRow = (page - 1) * limit;
+
+            var list = await _context.TodoItems.Skip(startRow).Take(limit).ToListAsync();
+
+            var listModel = new List<TodoItemModel>();
+
+            foreach (var item in list)
+            {
+                listModel.Add(_mapper.Map<TodoItemModel>(item));
+            }
+
+            return (listModel, tot);
+        }
+
         public async Task<TodoItemModel> GetById(int id)
         {
             var item = await _context.TodoItems.FirstOrDefaultAsync(x => x.Id == id);
